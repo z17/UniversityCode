@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <vector>
 #include <iostream>
+#include <clocale>
+#include <fstream>
 
 using namespace std;
 
@@ -11,39 +13,65 @@ struct figure
 	virtual void print()=0;
 
 };
+
 struct Circle: public figure
 {
+	double radius;
+	
 	Circle(double nx, double ny, double nradius) 
 	{
 		 x = nx;
 		 y = ny;
 		 radius = nradius;
 	}
-	double radius;
 	virtual void print()
 	{
-		printf("Circle:\nx = %f\ny = %f\nradius = %f\n------------\n",x,y,radius);
+		cout << "Circle:\n";
+		cout << "x = " << x << "\n";
+		cout << "y = " << y << "\n";
+		cout << "radius = " << radius << "\n";
 	}
 };
 
 struct Triangle: public figure
 {
-	double length1;
-	double length2;
-	double a;
+
+	double z;
+	
+	Triangle(double nx, double ny, double nz) 
+	{
+		x = nx;
+		y = ny;
+		z = nz;
+		}
 	virtual void print()
 	{
-		printf("Triangle:\nx = %f\ny = %f\nlength1 = %f\nlength2 = %f\na = %f\n------------\n",x,y,length1,length2);
+		cout << "Triangle:\n";
+		cout << "x = " << x << "\n";
+		cout << "y = " << y << "\n";
+		cout << "z = " << z << "\n";
 	}
 };
 
 struct Rectangle: public figure
 {
-	double width;
-	double height;
+	double z;
+	double q;
+	
+	Rectangle(double nx, double ny, double nz, double nq)
+	{
+		x = nx;
+		y = ny;
+		z = nz;
+		q = nq;
+	}
 	virtual void print()
 	{
-		printf("Rectangle:\nx = %f\ny = %f\nwidth = %f\nheight = %f\n------------\n",x,y,width,height);
+		cout << "Rectangle:\n";
+		cout << "x = " << x << "\n";
+		cout << "y = " << y << "\n";
+		cout << "z = " << z << "\n";
+		cout << "q = " << q << "\n";
 	}
 };
 
@@ -54,52 +82,61 @@ struct figurePull
 	void printAll()
 	{
 		int n = figures.size();
+		ofstream out ("out.txt");
 		for (int i = 0; i < n; i++)
 		{
 			figures[i] -> print();
-			printf("\n----------\n");
+			cout << "\n";
 		}
 	}
 
 	void newFigure()
 	{
 		int type;
-		printf ("\n1 - circle, 2 - tr, 3 - rectangle\n");
-		scanf("%d",&type);
-		double x,y;
+		//cout << "\n1 - circle, 2 - tr, 3 - rectangle\n";
+		cin >> type;
+		double x,y,z,q;
 		figure *newFig = 0;
 		switch ( type )
 		{
 		case 1:
-			printf ("x,y,radius\n");
-			double radius;
-		//	scanf ("%f",&x);
-		//	scanf ("%f",&y);
-		//	scanf ("%f",&radius);
-			cin >> x >> y >> radius;
-			newFig = new Circle(x,y,radius);
-		//	newFig -> x = x;
-	//		newFig -> y = y;
-	//		newFig -> radius = radius;
+			//cout << "x,y,radius\n";
+			cin >> x >> y >> q;
+			newFig = new Circle(x,y,q);
 			figures.push_back(newFig);
 			break;
 		case 2:
-			newFig = new Triangle;
+			//cout << "x,y,z\n";
+			cin >> x >> y >> z;
+			newFig = new Triangle(x,y,z);
+			figures.push_back(newFig);
 			break;
 		case 3:
-			newFig = new Triangle;
+			//cout << "x,y,z,q\n";
+			cin >> x >> y >> z >> q;
+			newFig = new Rectangle(x,y,z,q);
+			figures.push_back(newFig);
 			break;
 		default: 
-			printf("error\n");
+			cout << "error\n";
 		 }
-	
 	}
 };
 
 void main()
 {
-
+	freopen("in.txt", "r", stdin);
+	freopen("out.txt", "w", stdout);
 	figurePull a;
 	a.newFigure();
+	a.newFigure();
 	a.printAll();
+	
+	/*
+	setlocale(LC_ALL,"");
+		while (1)
+	{
+	cout << "Все молодцы! Все молодцы! Все молодцы! Все молодцы! Все молодцы! Все молодцы!\n";
+	}
+	*/
 }
