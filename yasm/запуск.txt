@@ -1,0 +1,2 @@
+yasm.exe prog.asm -f win32
+link.exe prog.obj /subsystem:console /entry:start /defaultlib:kernel32.lib /defaultlib:user32.lib /libpath:"C:\Program Files x64\Microsoft SDKs\Windows\v6.0A\Lib"
