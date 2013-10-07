@@ -93,27 +93,44 @@ struct figurePull
 	void newFigure()
 	{
 		int type;
-		//cout << "\n1 - circle, 2 - tr, 3 - rectangle\n";
 		cin >> type;
 		double x,y,z,q;
 		figure *newFig = 0;
 		switch ( type )
 		{
 		case 1:
-			//cout << "x,y,radius\n";
 			cin >> x >> y >> q;
 			newFig = new Circle(x,y,q);
 			figures.push_back(newFig);
 			break;
 		case 2:
-			//cout << "x,y,z\n";
 			cin >> x >> y >> z;
 			newFig = new Triangle(x,y,z);
 			figures.push_back(newFig);
 			break;
 		case 3:
-			//cout << "x,y,z,q\n";
 			cin >> x >> y >> z >> q;
+			newFig = new Rectangle(x,y,z,q);
+			figures.push_back(newFig);
+			break;
+		default: 
+			cout << "error\n";
+		 }
+	}
+	void newFigure(int type, double x, double y, double z, double q)	// для теста1
+	{
+		figure *newFig = 0;
+		switch ( type )
+		{
+		case 1:
+			newFig = new Circle(x,y,q);
+			figures.push_back(newFig);
+			break;
+		case 2:
+			newFig = new Triangle(x,y,z);
+			figures.push_back(newFig);
+			break;
+		case 3:
 			newFig = new Rectangle(x,y,z,q);
 			figures.push_back(newFig);
 			break;
@@ -124,19 +141,22 @@ struct figurePull
 };
 
 void main()
-{
-	freopen("in.txt", "r", stdin);
-	freopen("out.txt", "w", stdout);
+{	
+	/* тест 1
 	figurePull a;
+	freopen("out.txt", "w", stdout);
+	a.newFigure(1,1,1,1,1);
+	a.newFigure(2,1,2,1,0);
+	a.newFigure(3,3,1,2,4);
+	a.printAll();
+	*/
+
+	/* тест 2
+	figurePull a;
+	freopen("in.txt", "r", stdin);
+	a.newFigure();
 	a.newFigure();
 	a.newFigure();
 	a.printAll();
-	
-	/*
-	setlocale(LC_ALL,"");
-		while (1)
-	{
-	cout << "Все молодцы! Все молодцы! Все молодцы! Все молодцы! Все молодцы! Все молодцы!\n";
-	}
 	*/
 }
