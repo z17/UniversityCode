@@ -79,7 +79,8 @@ void printBit2 (string x, int count0, int count0Max, int count1, int count1Max)
 
 void main()
 {
-/*	int x = 5;
+/*
+	int x = 5;
 	int factX;
 	factX = fact(x);
 	printf("fac = %d\n",factX);

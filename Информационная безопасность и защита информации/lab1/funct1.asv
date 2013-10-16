@@ -1,0 +1,48 @@
+function [] = funct1() 
+%slCharacterEncoding('utf-8');
+% кодирует шифром Цезаря
+
+f1 = fopen('textin.txt','r');
+str = fscanf(f1,'%c');
+n = length(str);
+
+offset = 5;
+alf = 32;
+
+for i = 1:1:n
+    if double(str(i)) >= 224 & double(str(i)) <= 255
+        str(i) = mod((double(str(i)) + offset),alf) + 224;
+    end
+end    
+
+f2 = fopen('textout.txt','w');
+fwrite(f2,str);
+
+fclose(f1);
+fclose(f2);
+
+% Декодировщик 
+f1 = fopen('textout.txt','r');
+str = fscanf(f1,'%c');
+n = length(str);
+
+mas = []
+for i = 1:1:alf
+    mas(i) = 0;
+end
+for i = 1:1:n
+    if double(str(i)) >= 224 & double(str(i)) <= 255
+       % mas(shar(double(str(i)) - 224)) =  mas(char(double(str(i)) - 224)+1;
+    %$    x = double(str(i)) - 224;
+      %  mas(char(x))
+       x
+    end
+end 
+
+
+f2 = fopen('textout2.txt','w');
+fwrite(f2,str);
+
+fclose(f1);
+fclose(f2);
+end

@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="lab1"
-	ProjectGUID="{9B81068F-0423-44AA-B56E-B87C528AA477}"
-	RootNamespace="lab1"
+	Name="printPi"
+	ProjectGUID="{D502E26C-4307-4B6C-BB57-6ACE2AA7A836}"
+	RootNamespace="printPi"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -60,7 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/NXCOMPAT"
+				AdditionalOptions="/NXCOMPAT&#x0D;&#x0A;&quot;H:\yasm\test\progflb.obj&quot;"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -177,6 +177,10 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
+			<File
+				RelativePath=".\code.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -189,10 +193,6 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
-			<File
-				RelativePath=".\code.cpp"
-				>
-			</File>
 		</Filter>
 	</Files>
 	<Globals>
