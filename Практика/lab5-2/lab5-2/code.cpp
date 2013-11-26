@@ -57,10 +57,11 @@ void delnoiseMore(string s, int n)
 	int j = 0;
 	bool fl = false;
 	string s1 = s;
-	while (fl == false && j < n)
+	while (fl == false && j <= n)
 	{
 		s1 = s;
 		s1.erase(j,1);
+		int as = getSum(s1);
 		if (getSum(s1) % (n+1) == 0 && fl == false)
 		{
 			cout << s1 << endl;
@@ -72,7 +73,6 @@ void delnoiseMore(string s, int n)
 
 void delnoiseLess(string s, int sum, int n)
 {
-	// ------------------------ new code ----------------------------------
 	if (sum % (n+1) == 0)
 	{
 		s.insert(n-1,"0");
@@ -86,64 +86,36 @@ void delnoiseLess(string s, int sum, int n)
 		int countOne = getNumberOne(s);
 		if (dev <= countOne)
 		{
-			int imax = countOne - dev;
-			int i = 0;
-			while (i != imax)
+			int i = s.size();
+			int j = 0;
+			while (j != dev)
 			{
+				i--;
 				if (s[i] == '1')
 				{
-					i++;
-				}								
+					j++;
+				}
 			}
 			s.insert(i,"0");
 			cout << s << endl;
 		}
 		else
 		{
-			int pos = dev - sumOld - countOne + 1;
-			if (pos >=0)
+			int i = s.size()-1;
+			int countOneRight = 0;
+			i = s.size();
+			while (i + countOneRight + sumOld + 1 != sum)
 			{
-				s.insert(pos,"1");
-			}
-			else
-			{
-				int i = s.size()-1;
-				int countOneRight = 0;
+				i--;
 				if (s[i] == '1')
 				{
 					countOneRight++;
 				}
-				while (i + countOneRight + sumOld + 1 != sum)
-				{
-					i--;
-					if (s[i] == '1')
-					{
-						countOneRight++;
-					}
-				}
+			}
 			s.insert(i,"1");
-		}
 			cout << s << endl;
 		}
 	}
-/*
-				for (int j = 0; j < n; j++)
-				{
-					string s1 = s;
-					s1.insert(j,"1");
-					if (getSum(s1) % (n+1) == 0 && fl == false)
-					{
-						cout << s1 << endl;
-						fl = true;
-					}
-					s1 = s;
-					s1.insert(j,"0");
-					if (getSum(s1) % (n+1) == 0 && fl == false)
-					{
-						cout << s1 << endl;
-						fl = true;
-					}
-				} */
 }
 void main()
 {
