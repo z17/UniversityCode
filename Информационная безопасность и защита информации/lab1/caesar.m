@@ -21,7 +21,7 @@ fclose(f2);
 
 % Декодировщик перебором
 
-f3 = fopen('F6_ciph_ces.txt','r', 'n', 'windows-1251');
+f3 = fopen('сaesarOutCode.txt','r', 'n', 'windows-1251');
 str = fscanf(f3,'%c');
 fclose(f3);	
 n = length(str);

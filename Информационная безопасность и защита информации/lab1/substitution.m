@@ -7,7 +7,7 @@ f1 = fopen('textin.txt','r', 'n', 'windows-1251');
 str = fscanf(f1,'%c');
 n = length(str);
 
-arraySub = [3, 5, 6, 9, 12, 14, 16, 19, 23, 25, 32, 29 , 31, 30, 1, 2, 8, 4, 7, 11, 24, 20, 15, 10, 13, 28,22,17,18,21,26,27];
+arraySub = [3, 5, 6, 9, 12, 14, 16, 19, 23, 25, 32, 29 , 31, 30, 1, 2, 8, 4, 7, 11, 24, 20, 15, 10, 13, 28, 22, 17, 18, 21, 26, 27];
 
 for i = 1:1:n
 	if double(str(i)) >= 1072 & double(str(i)) <= 1103
@@ -69,21 +69,14 @@ for i = 1:1:n
 	if double(str(i)) >= 1072 & double(str(i)) <= 1103
 		if double(str(i)) - 1072 == max1Ind
 			str1(i) = 1071 + 15;
-		end
-		if double(str(i)) - 1072 == max2Ind
-			str1(i) = 1071 + 1;
-		end
-		
+		end			
    end
 end
 
 f4 = fopen('textoutDECODE1.txt','w', 'n', 'windows-1251');
-f5 = fopen('textoutDECODE2.txt','w', 'n', 'windows-1251');
 
 fprintf(f4,'%c',str1);
-fprintf(f5,'%c',str2);
 
 fclose(f3);
 fclose(f4);
-fclose(f5);
 end
