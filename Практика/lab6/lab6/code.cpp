@@ -14,6 +14,19 @@ struct task
 	}
 };
 
+/*
+test 
+3 4
+1 2
+1 3
+4 5
+4 6
+WA
+выводит IMPOSSIBLE
+а должен 
+1 5 6
+2 3 4
+*/
 void main()
 {
 	int n,m;
@@ -31,11 +44,62 @@ void main()
 		cin >> x >> y;
 		x--;
 		y--;
-
+		
+		int swap;		// костыль, который падает на 3-м тесте
+		if (count1 <= count2)
+		{
+			swap = x;
+			x = y;
+			y = swap;
+		}
 		if (mas[x].firstRound == true && mas[x].secondRound == true && mas[y].firstRound == true && mas[y].secondRound == true)
 		{
 			mas[x].secondRound = false;
 			mas[y].firstRound = false;
+		}
+		else
+		{
+
+			
+			if (mas[x].secondRound == false && mas[y].firstRound == true)
+			{
+				mas[y].firstRound = false;
+				count2++;
+
+			}
+			if (mas[x].firstRound == false && mas[y].secondRound == true)
+			{
+				mas[y].secondRound = false;
+				count1++;
+
+			}
+
+			if (mas[y].secondRound == false && mas[x].firstRound == true)
+			{
+				mas[x].firstRound = false;
+				count2++;
+			}
+			
+			if (mas[y].firstRound == false && mas[x].secondRound == true)
+			{
+				mas[x].secondRound = false;
+				count1++;
+			}
+		}
+
+		/*
+
+		if (mas[x].secondRound == false && mas[y].firstRound == true)
+		{
+			mas[y].firstRound = false;
+			count2++;
+
+		}
+		if (mas[x].firstRound == false && mas[y].secondRound == true)
+		{
+			mas[y].secondRound = false;
+			count1++;
+
 		}
 
 		if (mas[y].secondRound == false && mas[x].firstRound == true)
@@ -48,7 +112,8 @@ void main()
 		{
 			mas[x].secondRound = false;
 			count1++;
-		}
+		}*/
+
 	}
 
 	for (int i = 0; i < 2*n; i++)
@@ -75,7 +140,7 @@ void main()
 			}
 		}
 	}
-	if (count1 != count2)
+	if (count1 != count2 || round1.size() < n || round2.size() < n)
 	{
 		cout << "IMPOSSIBLE" << endl;
 	}
@@ -93,3 +158,4 @@ void main()
 		cout << endl;	
 	}
 }
+
