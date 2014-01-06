@@ -115,11 +115,7 @@ function cip = DES(input1, key1)
             44, 49, 39, 56, 34, 53, 46, 42, 50, 36, 29, 32
      ];
     KP=KP';
-     
-    %input = sscanf(dec2bin(input1,64),'%1d');
-    %input = input';
-    %input = dec2bin(input1);
-    
+         
     input = hex2bin(input1,16); 
     key = hex2bin(key1, 16); 
     
@@ -183,13 +179,7 @@ function cip = DES(input1, key1)
     
     %обратная перестановка
     cip1(1:64)=EN(IP(1:64));
-    
-    %L(1:32) = EN(1:32);
-    %R(1:32) = EN(33:64);
-    %l = bin2dec(L);
-    %r = bin2dec(R);
-    %cip = bin2dec(cip1);
-    
+        
     cip=bin2hex(cip1, 16);   
     
 end
