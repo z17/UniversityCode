@@ -1,9 +1,13 @@
 #include <iostream>
 #include <vector>
 #include <stdlib.h>
-#include<cstdlib>
+#include <cstdlib>
 #include <algorithm>
 #include <time.h>
+#include <math.h>
+#include <fstream>
+
+#define PI 3.14159265
 
 using namespace std;
 
@@ -30,7 +34,9 @@ struct pullPerson
 	int xMin;
 	int yMax;
 	int yMin;
-
+	pullPerson ()
+	{
+	}
 	pullPerson (int x1, int x2, int y1, int y2)
 	{
 		xMax = x1;
@@ -79,40 +85,30 @@ struct pullPerson
 
 		x = e * pull[indexParents[0]] -> x + (1 - e)* pull[indexParents[1]] -> x;
 		y = e * pull[indexParents[0]] -> y + (1 - e)* pull[indexParents[1]] -> y;
-
-		this -> getMutation(x,y);
-	}
-
-	// мутаци€ новой особи
-	void getMutation(double x, double y)
-	{
-		double d1 = rand() % 100;
-		d1 = d1 / 100;
-		double d2 = rand() % 100;
-		d2 = d2 / 100;
 	
-		// рандомно прибавл€ем или отнимаем
-		int a = rand() % 2;
-		if (a == 0)
-			x = x + d1;
-		else
-			x = x - d1;
-		a = rand() % 2;
-		if (y == 0)
-			y = y + d2;
-		else
-			y = y - d2; 
-
 		this -> newPerson(x,y);
 	}
 
-	// фитнесс - функци€
-	double fitness(double x, double y)
+	// мутаци€ всех особей с определЄнной веро€тностью x
+	void getMutation(int x)
 	{
-		double ret = x*x + y*y;	
-		return ret;
+		for (int i = 0; i < pull.size(); i++)
+		{
+			if (rand() % 10 < x)
+			{
+				// -1 .. +1
+				double d1 = rand() % 200 - 100;
+				d1 = d1 / 100;
+				double d2 = rand() % 200 - 100;
+				d2 = d2 / 100;
+			//	cout << d1 << " " << d2 << endl;
+			
+				this -> pull[i] -> x = this -> pull[i] -> x + d1;
+				this -> pull[i] -> y = this -> pull[i] -> y + d2;
+			}
+		}
 	}
-	
+
 	// сортировка пузырьком дл€ массива pull
 	vector<person *> sortPull(vector<person *> a)
 	{
@@ -129,31 +125,78 @@ struct pullPerson
 		return a;
 	}
 
-	// скрещивание -> мутаци€ -> отбор
-	void choicepull(int size)
+	// 1 скрещивание -> мутаци€ всех -> отбор
+	void choicepull(int size, int probability)
 	{
 		this -> makeCrossing();
-		this->pull = sortPull(this->pull);
-		this->pull.pop_back();
+		this -> getMutation(probability);		
+		this -> pull = sortPull(this->pull);
+		this -> pull.pop_back();
+	}
+
+	// фитнесс - функци€
+	double fitness(double x, double y)
+	{
+		double ret;
+		ret = x*x + y*y;	
+		//ret = 3*x*x + 2*y*y - 4*y + x - 2;	
+		//ret = x*x+2*y*y+4*y-x+2;
+		//double pre = x*x + y*y;
+		//ret = -(sin(pre * PI / 180))/pre;
+		return ret;
 	}
 };
 
+void takeResult(pullPerson *populationMain, int sizePopulation, double xreal, double yreal, vector<int> probability)
+{	
+	ofstream f;
+	f.open("in.txt");
+	pullPerson *pop = new pullPerson;	
+
+	double x,y;
+	int prob;
+	for (int j = 0; j < probability.size(); j++)
+	{
+		*pop = *populationMain; // загрузка в population исходной созданной попул€ции
+		prob = probability[j];
+		for (int i = 0; i < 50; i++)
+		{
+			pop->choicepull(sizePopulation, prob);	
+			double result;
+			x = pop->pull[0]->x;
+			y = pop->pull[0]->y;
+			result = sqrt(pow(x - xreal,2) + pow(y - yreal,2));
+			f << result << "	";
+		}
+		f << endl;
+		cout << endl << " " << pop->pull[0]->x << " " << pop->pull[0]->y << " " << pop->fitness(pop->pull[0]->x,pop->pull[0]->y) << endl;
+
+	}
+	f.close();
+}
+
 void main()
 {	
-	srand(time(NULL));
+	srand((unsigned)time(NULL));
 
-	pullPerson *population = new pullPerson(10, 0, 10, 0);
-	int sizePopulation = 10;
+	pullPerson *population = new pullPerson(50, -50, 50, -50);
+	int sizePopulation = 50;
 
 	for (int i = 0; i < sizePopulation; i++)
 	{
 		population->newPerson();		
 	}
+	double xreal, yreal;	// реальные значени€ экстремума
+	xreal = 0;
+	yreal = 0;
+	
+	// веро€тности
+	vector<int> probability;
+	probability.push_back(1);
+	probability.push_back(5);
+	probability.push_back(9);
+	// запуск с разными веро€тност€ми
+	takeResult(population, sizePopulation, xreal, yreal, probability);
 
-	for (int i = 0; i < 10000; i++)
-	{
-		population->choicepull(sizePopulation);	
-	}
-	cout << " " << population->pull[0]->x << " " << population->pull[0]->y << " " << population->fitness(population->pull[0]->x,population->pull[0]->y) << endl;
-	cout << endl;
+
 }
