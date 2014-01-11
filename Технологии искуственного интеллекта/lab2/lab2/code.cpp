@@ -128,21 +128,27 @@ struct pullPerson
 	// 1 скрещивание -> мутация всех -> отбор
 	void choicepull(int size, int probability)
 	{
-		this -> makeCrossing();
+		for (int i = 0; i < 25; i++)	// 25 скрещиваний
+		{
+			this -> makeCrossing();
+		}
 		this -> getMutation(probability);		
 		this -> pull = sortPull(this->pull);
-		this -> pull.pop_back();
+		for (int i = 0; i < 25; i++)
+		{
+			this -> pull.pop_back();
+		}
 	}
 
 	// фитнесс - функция
 	double fitness(double x, double y)
 	{
 		double ret;
-		ret = x*x + y*y;	
-		//ret = 3*x*x + 2*y*y - 4*y + x - 2;	
-		//ret = x*x+2*y*y+4*y-x+2;
-		//double pre = x*x + y*y;
-		//ret = -(sin(pre * PI / 180))/pre;
+	//	ret = x*x + y*y;	
+	//	ret = 3*x*x + 2*y*y - 4*y + x - 2;	
+	//	ret = x*x+2*y*y+4*y-x+2;
+		double pre = x*x + y*y;
+		ret = -(sin(pre * PI / 180))/pre;
 		return ret;
 	}
 };
@@ -179,7 +185,7 @@ void main()
 {	
 	srand((unsigned)time(NULL));
 
-	pullPerson *population = new pullPerson(50, -50, 50, -50);
+	pullPerson *population = new pullPerson(50, 5, 50, 5);
 	int sizePopulation = 50;
 
 	for (int i = 0; i < sizePopulation; i++)
