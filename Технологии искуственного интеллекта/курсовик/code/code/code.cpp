@@ -1,13 +1,39 @@
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 
 #include <vector>
 #include <string>
 #include <stdlib.h>
 #include <cstdlib>
-#include <algorithm>
 
 using namespace std;
+
+/*
+to do:
+- проверка добавлено ли такое св-во уже (убрать дублирование при описании)
+- для свойств ввести отрицание !(свойство), его приоритет
+- проверка на существование родителя
+- если родителя не существует - создавать объект с пустыми свойствами, если дальше он описывается - дописывать св-ва в этот объект
+- вывод всех родителей
+*/
+
+template <typename T>
+vector<T> merge(vector<T> one, vector<T> two)
+{
+	vector<T> res;
+
+	for (int i = 0; i < one.size(); i++)
+	{
+		res.push_back(one[i]);
+	}	
+	for (int i = 0; i < two.size(); i++)
+	{
+		res.push_back(two[i]);
+	}
+
+	return res;
+}
 
 struct customClass
 {
@@ -38,15 +64,34 @@ public:
 		return this -> properties;
 	}
 
+	// рекурсивно получаем все свойства класса (свои и всех родителей)
+	vector<string> getAllPropetries()
+	{
+		vector<string> parentsPropetries;
+		if (this->parent != NULL)
+		{
+			parentsPropetries = merge(this->properties,this->parent->getAllPropetries());
+		}
+		else
+		{
+			parentsPropetries = this->properties;
+		}
+		return parentsPropetries;
+	}
+
+	// вывод класса на экран
 	void printClass()
 	{
 		cout << "Class" << endl;
 		cout << "Name: " << this -> name << endl;
 		cout << "Properties: ";
-		for (int i = 0; i < this->properties.size(); i++)
+		vector<string> currentPropetries;
+		currentPropetries = this -> getAllPropetries();			
+
+		for (int i = 0; i < currentPropetries.size(); i++)
 		{
-			cout << properties[i];
-			if (i + 1 != this->properties.size())
+			cout << currentPropetries[i];
+			if (i + 1 != currentPropetries.size())
 			{
 				cout << ", ";
 			}
@@ -56,12 +101,16 @@ public:
 	bool findProperty(string nameProperty)
 	{
 		bool fl = false;
-		int i = 0;
-		while (this->properties[i] != nameProperty && i > this->properties.size())
+		vector<string> allPropertes = this->getAllPropetries();
+		
+		int i = -1;		
+		do
 		{
 			i++;	
 		}
-		if (this->properties[i] == nameProperty)
+		while (allPropertes[i] != nameProperty && i+1 < allPropertes.size());
+
+		if (allPropertes[i] == nameProperty)
 		{
 			fl = true;
 		}
@@ -71,7 +120,7 @@ public:
 
 struct classWrap
 {
-	vector<customClass> massOfClasses;
+	vector<customClass *> massOfClasses;
 
 	classWrap()
 	{
@@ -90,9 +139,9 @@ struct classWrap
 			{
 				i++;	
 			}
-			while (this->massOfClasses[i].getNameClass() != nameParent && i+1 < this->massOfClasses.size());
+			while (this->massOfClasses[i]->getNameClass() != nameParent && i+1 < this->massOfClasses.size());
 	
-			if (this->massOfClasses[i].getNameClass() == nameParent)
+			if (this->massOfClasses[i]->getNameClass() == nameParent)
 			{
 				fl = true;
 			}
@@ -103,7 +152,7 @@ struct classWrap
 			}
 		}
 
-		customClass newClass(name, parent, properties);
+		customClass *newClass = new customClass(name, parent, properties);
 		massOfClasses.push_back(newClass);
 	}
 	bool loadFile(string path)
@@ -132,7 +181,6 @@ struct classWrap
 					activeClass = activeClass.substr(0, activeClass.find("<") - 1);
 				}
 
-
 				// преобразование свойств в массив
 				vector<string> newPropeties;
 				activeProperties = str.substr(12, str.length()-12);
@@ -158,21 +206,22 @@ struct classWrap
 	{
 		for (int i = 0; i < this->massOfClasses.size(); i++)
 		{
-			this->massOfClasses[i].printClass();
+			this->massOfClasses[i]->printClass();
 		}
 	}
 
 	bool isPropety(string className, string propetyName)
 	{
-		int i = 0;
 		bool fl = false;
-		while (this->massOfClasses[i].getNameClass() != className || i >= this->massOfClasses.size())
+		int i = -1;
+		do
 		{
 			i++;	
 		}
-		if (this->massOfClasses[i].getNameClass() == className)
+		while (this->massOfClasses[i]->getNameClass() != className && i+1 < this->massOfClasses.size());
+		if (this->massOfClasses[i]->getNameClass() == className)
 		{
-			fl = this->massOfClasses[i].findProperty(propetyName);
+			fl = this->massOfClasses[i]->findProperty(propetyName);
 		}
 		return fl;
 	}
