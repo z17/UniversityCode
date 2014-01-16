@@ -1,8 +1,8 @@
 Class: animal
-Properties: growing, regeneration
+Properties: growing, growing, regeneration
 Class: bird < animal
 Properties: fly
 Class: penguin < bird
-Properties: !(fly)
+Properties: !fly
 Class: sparrow < bird
-Properties: small
+Properties: small, one
