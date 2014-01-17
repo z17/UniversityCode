@@ -1,0 +1,6 @@
+Class: test
+Properties:
+Class: animal < test
+Properties: growing, growing, regeneration
+Class: test
+Properties: one, two, three

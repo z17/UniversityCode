@@ -1,4 +1,4 @@
-Class: animal
+Class: animal < test
 Properties: growing, growing, regeneration
 Class: bird < animal
 Properties: fly
@@ -6,3 +6,5 @@ Class: penguin < bird
 Properties: !fly
 Class: sparrow < bird
 Properties: small, one
+Class: test < abra
+Properties: test2

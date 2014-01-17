@@ -71,7 +71,7 @@ void main()
 	
 	c1 -> options.push_back("ontable");
 	
-	c2 -> options.push_back("portable");	
+	c2 -> options.push_back("portable");
 	c3 -> options.push_back("portable");
 
 	c2 -> options.push_back("untouchscreen");	
