@@ -11,6 +11,10 @@ to do:
 + вывод всех родителей
 + вынесение в заголовочный файл части
 - вынести все настройки (типа образа входных данных "Class: ") отдельно, дабы в коде повсюду не привязываться к стандарту
++ добавить в класс поле содержимое
+- добавить вопросы типа "содержимое - класс" ответ на него yes/no
+- добавить вопросы типа содержимое? ответ - класс или false
+- getAllProperties()
 */
 
 // объединение массивов
@@ -24,31 +28,49 @@ private:
 	std::string name;						// имя	
 	customClass * parent;					// ссылка на родителя
 	std::vector<std::string> properties;	// свойства
+	std::vector<std::string> content;
 
 public:
 	customClass();
-	customClass(std::string, customClass *, std::vector<std::string>);
+	customClass(std::string, customClass *, std::vector<std::string>, std::vector<std::string>);
 	std::string getNameClass();						// возвращает имя 
 	std::vector<std::string> getListProperties();	// возвращает список свойств
 	std::vector<std::string> getAllProperties();	// рекурсивно возвращает все свойства класса (свои и всех родителей)
+	std::vector<std::string> getListContent();		// возвращает список содержимого
 	void printClass();								// вывод
 	bool findProperty(std::string);					// поиск свойства в списке свойств
 	int findProperty (std::string, std::vector<std::string>);	// возвращает номер свойства в массиве или -1, если не найден
 	bool setProperties(std::vector<std::string>);			// записывает в properties поданный на вход массив, если он пуст, иначе возвращает false 
+	bool setContent(std::vector<std::string>);				// записывает в content поданный на вход массив, если он пуст, иначе возвращает false 
 	std::vector<std::string> getAllParents();				// возвращает список всех родителей
 	void printAllParents();									// выводит список всех родителей
+};
+
+// структура, содержащая текстовые константы
+struct templateDescription
+{
+	std::string prefixClass;
+	std::string prefixProperties;
+	std::string prefixContent;
+	std::string symbolInheritance;
+	std::string separator;
+
+	templateDescription();							// дефолтное заполнение
+	templateDescription(std::string, std::string, std::string, std::string, std::string);	// нестандартное заполнение
 };
 
 // обёртка - массив классов
 struct classWrap
 {
 	std::vector<customClass *> massOfClasses;		// массив классов 
+	templateDescription* options;
 
 	classWrap();
-	void addClass(std::string, std::string, std::vector<std::string>);	// добавление класса
+	void addClass(std::string, std::string, std::vector<std::string>, std::vector<std::string>);	// добавление класса
 	bool loadFile(std::string);											// загрузка из файла
 	void printClasses();												// вывод всех классов
 	bool isProperty(std::string, std::string);				// проверка существования свойства в определённом классе
 	int isClass(std::string);		// проверка существования класса. возвращает: -1 - класс не существует,  -2 - класс существует, но заполнен (ошибка), индекс класса в массиве massOfClasses если класс сущесвует, но не заполнен свойствами
 	void printParentsOfClass(std::string); // вывод списка родителей класса
+	
 };

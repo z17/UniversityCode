@@ -1,5 +1,6 @@
 Class: animal < test
 Properties: growing, growing, regeneration
+Content: jak, millo
 Class: bird < animal
 Properties: fly
 Class: penguin < bird

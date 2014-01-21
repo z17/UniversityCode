@@ -41,10 +41,11 @@ customClass::customClass()
 {
 }
 
-customClass::customClass(string nameOfClass, customClass * parentClass, vector<string> listProperties)
+customClass::customClass(string nameOfClass, customClass * parentClass, vector<string> listProperties, vector<string> listContent)
 {
 	this -> name = nameOfClass;
 	this -> properties = listProperties;
+	this -> content = listContent;
 	this -> parent = parentClass;
 }
 
@@ -56,6 +57,11 @@ string customClass::getNameClass()
 vector<string> customClass::getListProperties()
 {
 	return this -> properties;
+}
+
+vector<string> customClass::getListContent()
+{
+	return this -> content;
 }
 
 vector<string> customClass::getAllParents()
@@ -135,20 +141,40 @@ vector<string> customClass::getAllProperties()
 
 void customClass::printClass()
 {
-	cout << "Class" << endl;
+	cout << "-- Class --" << endl;
 	cout << "Name: " << this -> name << endl;
-	cout << "Properties: ";
 	vector<string> currentProperties;
-	currentProperties = this -> getAllProperties();			
-	for (int i = 0; i < currentProperties.size(); i++)
+	currentProperties = this -> getAllProperties();		
+	if (currentProperties.size() > 0)
 	{
-		cout << currentProperties[i];
-		if (i + 1 != currentProperties.size())
+		cout << "Properties: ";	
+		for (int i = 0; i < currentProperties.size(); i++)
 		{
-			cout << ", ";
+			cout << currentProperties[i];
+			if (i + 1 != currentProperties.size())
+			{
+				cout << ", ";
+			}
 		}
+		cout << endl;
 	}
-	cout << endl << "---------" << endl;
+	vector<string> currentContent;
+	currentContent = this -> getListContent();	
+	//currentProperties = this -> getAllProperties();		// добавить эту функцию	
+	if (currentContent.size() > 0)
+	{
+		cout << "Content: ";
+		for (int i = 0; i < currentContent.size(); i++)
+		{
+			cout << currentContent[i];
+			if (i + 1 != currentContent.size())
+			{
+				cout << ", ";
+			}
+		}
+		cout << endl;
+	}
+	cout << endl;
 }
 
 bool customClass::findProperty(string nameProperty)
@@ -193,11 +219,32 @@ bool customClass::setProperties(vector<string> newProperties)
 		this->properties = newProperties;
 		fl = true;
 	}
+	if (newProperties.size() == 0)
+	{
+		fl = true;
+	}
 	return fl;
 }
 
-classWrap::classWrap()
+bool customClass::setContent(vector<string> newContent)
 {
+	bool fl = false;
+	if (this->content.size() == 0)
+	{
+		this->content = newContent;
+		fl = true;
+	}
+	if (newContent.size() == 0)
+	{
+		fl = true;
+	}
+	return fl;
+}
+
+
+classWrap::classWrap()
+{	
+	this -> options = new templateDescription;
 }
 
 int classWrap::isClass(string nameClass)
@@ -215,7 +262,16 @@ int classWrap::isClass(string nameClass)
 
 		if (this->massOfClasses[i]->getNameClass() == nameClass)
 		{
-			if (this->massOfClasses[i]->getAllProperties().size() == 0)
+			if (this->massOfClasses[i]->getListProperties().size() > 0 && this->massOfClasses[i]->getListContent().size() > 0)
+			{
+				result = -2;
+			}
+			else
+			{
+				result = i;
+			}
+
+		/*	if (this->massOfClasses[i]->getListProperties().size() == 0 ||)
 			{
 				result = i;
 			}
@@ -223,13 +279,14 @@ int classWrap::isClass(string nameClass)
 			{
 				result = -2;
 			}
+		*/
 		}
 	}
 
 	return result;
 }
 
-void classWrap::addClass(string name, string nameParent, vector<string> properties)
+void classWrap::addClass(string name, string nameParent, vector<string> properties, vector<string> content)
 {
 	int posClass = this->isClass(name);
 	if (posClass == -2)
@@ -238,76 +295,84 @@ void classWrap::addClass(string name, string nameParent, vector<string> properti
 		cout << "ERROR: duplicate description object" << endl;
 		exit(EXIT_FAILURE);
 	}
+
+	customClass * parent = NULL;
+	if (nameParent != "")
+	{
+		// определяем есть ли родитель
+		bool fl = false;
+		int i = -1;
+		if (this->massOfClasses.size() != 0)	// если в массиве хоть что-то есть
+		{			
+			do
+			{
+				i++;	
+			}
+			while (this->massOfClasses[i]->getNameClass() != nameParent && i+1 < this->massOfClasses.size());
+	
+			if (this->massOfClasses[i]->getNameClass() == nameParent)
+			{
+				fl = true;
+			}
+		}
+
+		if (fl)
+		{
+			parent = this->massOfClasses[i];
+		}
+		else
+		{
+			// если родитель был указан, но не найден - создание родителя
+			vector<string> emptyVector;
+			
+			this->addClass(nameParent, "", emptyVector, emptyVector);
+			parent = this->massOfClasses[this->massOfClasses.size()-1];
+		}
+	}
+
+	// проверка дублирования свойств. Если есть дублирование - удаляем
+	vector<string> test = merge(properties, parent->getAllProperties());
+	int lenght = properties.size();
+	int i = 0;
+	while (i < lenght)
+	{
+		int k = 0;
+		for (int j = 0; j < test.size(); j++)
+		{
+			if (test[i] == test[j])
+			{
+				k++;
+			}
+		}
+		if (k > 1)
+		{
+			test.erase(test.begin() + i);
+			lenght--;
+		}
+		else
+		{
+			i++;
+		}
+		properties.assign(test.begin(), test.begin()+lenght);
+	}
+
 	if (posClass == -1)
 	{
-		// если такого класса не существовало
-		customClass * parent = NULL;
-		if (nameParent != "")
-		{
-			// определяем есть ли родитель
-			bool fl = false;
-			int i = -1;
-			if (this->massOfClasses.size() != 0)	// если в массиве хоть что-то есть
-			{			
-				do
-				{
-					i++;	
-				}
-				while (this->massOfClasses[i]->getNameClass() != nameParent && i+1 < this->massOfClasses.size());
-
-				if (this->massOfClasses[i]->getNameClass() == nameParent)
-				{
-					fl = true;
-				}
-			}
-			
-			if (fl)
-			{
-				parent = this->massOfClasses[i];
-			}
-			else
-			{
-				// если родитель был указан, но не найден - создание родителя
-				vector<string> parentProperties;
-				
-				this->addClass(nameParent, "", parentProperties);
-				parent = this->massOfClasses[this->massOfClasses.size()-1];
-			}
-		}
-
-		// проверка дублирования свойств. Если есть дублирование - удаляем
-		vector<string> test = merge(properties, parent->getAllProperties());
-		int lenght = properties.size();
-		int i = 0;
-		while (i < lenght)
-		{
-			int k = 0;
-			for (int j = 0; j < test.size(); j++)
-			{
-				if (test[i] == test[j])
-				{
-					k++;
-				}
-			}
-			if (k > 1)
-			{
-				test.erase(test.begin() + i);
-				lenght--;
-			}
-			else
-			{
-				i++;
-			}
-			properties.assign(test.begin(), test.begin()+lenght);
-		}
-
-		customClass *newClass = new customClass(name, parent, properties);
+		// если такого класса не существовало		
+		customClass *newClass = new customClass(name, parent, properties, content);
 		massOfClasses.push_back(newClass);
 	}
 	else
 	{
-		// если класс существует, но пустой,записываем новые св-ва в него
-		this->massOfClasses[posClass]->setProperties(properties);
+		// если класс существует, но пустой, записываем новые св-ва и содержимое в него
+		bool flag1, flag2;
+		flag1 = this->massOfClasses[posClass]->setProperties(properties);
+		flag2 = this->massOfClasses[posClass]->setContent(content);
+		if (!flag1 || !flag2)
+		{
+			cout << "ERROR: duplicate description object" << endl;
+			exit(EXIT_FAILURE);
+		}
 	}
 }
 
@@ -317,44 +382,78 @@ bool classWrap::loadFile(string path)
 	string str;
 	string activeClass;
 	string activeProperties;
+	string activeContent;
 	string parentClass = "";
+	vector<string> emptyVector;
 	while (getline(f,str))
 	{
-		// если нашли ключевое слово Class - выделяем его имя
-		if (str.substr(0, 6) == "Class:")
-		{
-			activeClass = str.substr(7, str.length()-7);
-		}
-		// если нашли ключевое словл Properties: - выделяем и разбиваем в массив свойства, и создаём новый класс
-		if (str.substr(0, 11) == "Properties:")
+
+		// если нашли ключевое слово класса - выделяем его имя и создаём класс
+		// последующие строки до следующего ключевого слова класса относятся к текущему классу
+		if (str.substr(0, this->options->prefixClass.length()) == this->options->prefixClass)
 		{
 			parentClass = "";	// обнуление предыдущего значения
-			vector<string> parentsProperties;
+
+			activeClass = str.substr(this->options->prefixClass.length(), str.length()- this->options->prefixClass.length());
 			// определяем наследование
-			if (activeClass.find("<") < string::npos)
+			if (activeClass.find(this->options->symbolInheritance) < string::npos)
 			{
-				parentClass = activeClass.substr(activeClass.find("<") + 2, activeClass.length() - activeClass.find("<") + 1);
-				activeClass = activeClass.substr(0, activeClass.find("<") - 1);
+				int pos = activeClass.find(this->options->symbolInheritance);
+				int lengthSymbol = this->options->symbolInheritance.length();
+
+				parentClass = activeClass.substr(pos + lengthSymbol, activeClass.length() - pos - lengthSymbol);
+				activeClass = activeClass.substr(0, pos);
 			}
 
+			this -> addClass(activeClass, parentClass, emptyVector, emptyVector);
+		}
+
+		// если нашли ключевое слово свойств - выделяем и разбиваем в массив свойства, и создаём новый класс
+		if (str.substr(0, this->options->prefixProperties.length()) == this->options->prefixProperties)
+		{
 			// преобразование свойств в массив
 			vector<string> newPropeties;
-			if (str.length() > 11)
+			int lPrefix = this->options->prefixProperties.length();
+			if (str.length() > lPrefix)
 			{
-				activeProperties = str.substr(12, str.length()-12);
+				activeProperties = str.substr(lPrefix, str.length() - lPrefix);
 				string oneProp;
 				int newPos = 0;
-				while (activeProperties.find(",") < string::npos)
+				while (activeProperties.find(this->options->separator) < string::npos)
 				{
-					newPos = activeProperties.find(",");
+					newPos = activeProperties.find(this->options->separator);
 					oneProp = activeProperties.substr(0,newPos);
-					activeProperties = activeProperties.substr(newPos+2, activeProperties.length() - newPos+1);
+					activeProperties = activeProperties.substr(newPos + this->options->separator.length(), activeProperties.length() - newPos);
 					newPropeties.push_back(oneProp);
 				}
 				newPropeties.push_back(activeProperties);
 			}
-			this -> addClass(activeClass, parentClass, newPropeties);
-		}
+			this -> addClass(activeClass, parentClass, newPropeties, emptyVector);
+		}		
+
+		// если нашли ключевое слово контента - выделяем и разбиваем в массив свойства, и создаём новый класс
+		if (str.substr(0, this->options->prefixContent.length()) == this->options->prefixContent)
+		{
+			// преобразование свойств в массив
+			vector<string> newContent;			
+			int lPrefix = this->options->prefixContent.length();
+			if (str.length() > 11)
+			{
+				activeContent = str.substr(lPrefix, str.length()-lPrefix);
+				string oneCont;
+				int newPos = 0;
+				while (activeContent.find(this->options->separator) < string::npos)
+				{
+					newPos = activeContent.find(this->options->separator);
+					oneCont = activeContent.substr(0,newPos);
+					activeContent = activeContent.substr(newPos + this->options->separator.length(), activeProperties.length() - newPos);
+					newContent.push_back(oneCont);
+				}
+				newContent.push_back(activeContent);
+			}
+			this -> addClass(activeClass, parentClass, emptyVector, newContent);
+		}	
+
 	}
 	f.close();
 	return true;
@@ -405,13 +504,31 @@ void classWrap::printParentsOfClass(string className)
 	}
 }
 
+templateDescription::templateDescription()
+{
+	this->prefixClass = "Class: ";
+	this->prefixProperties = "Properties: ";
+	this->prefixContent = "Content: ";
+	this->symbolInheritance = " < ";
+	this->separator = ", ";
+}
+
+templateDescription::templateDescription(string prefix1, string prefix2, string prefix3, string symbol, string sep)
+{
+	this->prefixClass = prefix1;
+	this->prefixProperties = prefix2;
+	this->prefixContent = prefix3;
+	this->symbolInheritance = symbol;
+	this->separator = sep;
+}
+
 void main()
 {
 	setlocale (LC_CTYPE,"Russian");
 
 	classWrap test;
 
-	test.loadFile("input2.txt");
+	test.loadFile("input.txt");
 
 	// структура команды - "Класс вопрос о свойстве"
 	// ответ на команду - да/нет
