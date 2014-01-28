@@ -10,11 +10,9 @@ to do:
 + починить баг - ошибка при попытке добавить объект, у которого не описаны свойства
 + вывод всех родителей
 + вынесение в заголовочный файл части
-- вынести все настройки (типа образа входных данных "Class: ") отдельно, дабы в коде повсюду не привязываться к стандарту
++ вынести все настройки (типа образа входных данных "Class: ") отдельно, дабы в коде повсюду не привязываться к стандарту
++ протестировать вынос всех настроек
 + добавить в класс поле содержимое
-- добавить вопросы типа "содержимое - класс" ответ на него yes/no
-- добавить вопросы типа содержимое? ответ - класс или false
-- getAllProperties()
 */
 
 // объединение массивов
@@ -55,7 +53,7 @@ struct templateDescription
 	std::string symbolInheritance;
 	std::string separator;
 
-	templateDescription();							// дефолтное заполнение
+	templateDescription();																	// дефолтное заполнение
 	templateDescription(std::string, std::string, std::string, std::string, std::string);	// нестандартное заполнение
 };
 
@@ -67,10 +65,10 @@ struct classWrap
 
 	classWrap();
 	void addClass(std::string, std::string, std::vector<std::string>, std::vector<std::string>);	// добавление класса
-	bool loadFile(std::string);											// загрузка из файла
-	void printClasses();												// вывод всех классов
+	bool loadFile(std::string);								// загрузка из файла
+	void printClasses();									// вывод всех классов
 	bool isProperty(std::string, std::string);				// проверка существования свойства в определённом классе
-	int isClass(std::string);		// проверка существования класса. возвращает: -1 - класс не существует,  -2 - класс существует, но заполнен (ошибка), индекс класса в массиве massOfClasses если класс сущесвует, но не заполнен свойствами
-	void printParentsOfClass(std::string); // вывод списка родителей класса
+	int isClass(std::string);				// проверка существования класса. возвращает: -1 - класс не существует,  -2 - класс существует, но заполнен (ошибка), индекс класса в массиве massOfClasses если класс сущесвует, но не заполнен свойствами
+	void printParentsOfClass(std::string);	// вывод списка родителей класса
 	
 };

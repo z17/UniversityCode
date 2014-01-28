@@ -331,6 +331,7 @@ void classWrap::addClass(string name, string nameParent, vector<string> properti
 	}
 
 	// проверка дублирования свойств. Если есть дублирование - удаляем
+	// для content удаление дублирования не нужно
 	vector<string> test = merge(properties, parent->getAllProperties());
 	int lenght = properties.size();
 	int i = 0;
@@ -446,7 +447,7 @@ bool classWrap::loadFile(string path)
 				{
 					newPos = activeContent.find(this->options->separator);
 					oneCont = activeContent.substr(0,newPos);
-					activeContent = activeContent.substr(newPos + this->options->separator.length(), activeProperties.length() - newPos);
+					activeContent = activeContent.substr(newPos + this->options->separator.length(), activeContent.length() - newPos);
 					newContent.push_back(oneCont);
 				}
 				newContent.push_back(activeContent);
@@ -501,6 +502,10 @@ void classWrap::printParentsOfClass(string className)
 		{
 			this->massOfClasses[i]->printAllParents();
 		}
+		else
+		{
+			cout << "class not found" << endl;
+		}
 	}
 }
 
@@ -511,6 +516,14 @@ templateDescription::templateDescription()
 	this->prefixContent = "Content: ";
 	this->symbolInheritance = " < ";
 	this->separator = ", ";
+/*	
+input3.txt
+	this->prefixClass = "!";
+	this->prefixProperties = "?";
+	this->prefixContent = "-";
+	this->symbolInheritance = "*";
+	this->separator = "^";
+*/
 }
 
 templateDescription::templateDescription(string prefix1, string prefix2, string prefix3, string symbol, string sep)
@@ -527,19 +540,16 @@ void main()
 	setlocale (LC_CTYPE,"Russian");
 
 	classWrap test;
-
 	test.loadFile("input.txt");
 
-	// структура команды - "Класс вопрос о свойстве"
-	// ответ на команду - да/нет
 	string comand;
 	string nameClass;
 	string nameProperty;
 	cout << "Введите команду" << endl;
 	cout << "\tprintall\t- вывести всё" << endl;
-	cout << "\tprint <class>\t- вывести родителей класса" << endl;
+	cout << "\tprintTree <class>\t- вывести родителей класса" << endl;
 	cout << "\texit\t- выход" << endl;
-	cout << "\t<имя_класса> <имя свойства>\t- запрос существования свойства у класса" << endl;
+	cout << "\tproperty <имя_класса> <имя свойства>\t- запрос существования свойства у класса" << endl;
 	getline(cin,comand);
 	while (comand != "exit")
 	{
@@ -549,14 +559,15 @@ void main()
 			test.printClasses();
 			flComand = true;
 		}
-		if (comand.find("print ") < string::npos && !flComand)
+		if (comand.find("printTree ") == 0 && !flComand)
 		{
-			string className = comand.substr(6,comand.length()-6);
+			string className = comand.substr(10,comand.length()-10);
 			test.printParentsOfClass(className);
 			flComand = true;
 		}
-		if (!flComand)
+		if (comand.find("property ") == 0 && !flComand)
 		{
+			comand = comand.substr(9,comand.length()-9);
 			nameClass = comand.substr(0,comand.find(" "));
 			nameProperty = comand.substr(comand.find(" ")+1, comand.size() - comand.find(" ") - 1);
 			
@@ -566,6 +577,11 @@ void main()
 			} else {
 				cout << "No" << endl;
 			}
+			flComand = true;
+		}
+		if (!flComand)
+		{
+			cout << "unknown command" << endl;
 		}
 		getline(cin,comand);
 	}	

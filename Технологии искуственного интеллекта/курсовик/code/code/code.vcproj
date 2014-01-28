@@ -189,6 +189,10 @@
 				RelativePath=".\input2.txt"
 				>
 			</File>
+			<File
+				RelativePath=".\input3.txt"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

@@ -147,8 +147,9 @@ struct pullPerson
 	//	ret = x*x + y*y;	
 	//	ret = 3*x*x + 2*y*y - 4*y + x - 2;	
 	//	ret = x*x+2*y*y+4*y-x+2;
-		double pre = x*x + y*y;
-		ret = -(sin(pre * PI / 180))/pre;
+	//	double pre = x*x + y*y;
+	//	ret = -(sin(pre * PI / 180))/pre;
+		ret = x*x + y*y + 5;
 		return ret;
 	}
 };

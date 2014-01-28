@@ -1,0 +1,11 @@
+!animal*test
+?growing^growing^regeneration
+-jak^millo^test^millo
+!bird*animal
+?fly
+!penguin*bird
+?!fly
+!sparrow*bird
+?small^one
+!test*abra
+?test2
