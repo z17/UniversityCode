@@ -546,10 +546,10 @@ void main()
 	string nameClass;
 	string nameProperty;
 	cout << "Введите команду" << endl;
-	cout << "\tprintall\t- вывести всё" << endl;
-	cout << "\tprintTree <class>\t- вывести родителей класса" << endl;
-	cout << "\texit\t- выход" << endl;
-	cout << "\tproperty <имя_класса> <имя свойства>\t- запрос существования свойства у класса" << endl;
+	cout << " printall\t\t- вывести всё" << endl;
+	cout << " printTree <class>\t- вывести родителей класса" << endl;
+	cout << " exit\t\t\t- выход" << endl;
+	cout << " property <имя_класса> <имя свойства>\t- запрос существования свойства у класса" << endl;
 	getline(cin,comand);
 	while (comand != "exit")
 	{

@@ -4,7 +4,68 @@
 
 using namespace std;
 
-void main()
+// http://acm.timus.ru/problem.aspx?space=1&num=1826
+
+void algv2()
+{
+	int n;
+	vector <int> times;
+
+	cin >> n;
+
+	int q;
+	for (int i = 0; i < n; i++)
+	{
+		cin >> q;
+		times.push_back(q);
+	}
+
+	sort(times.begin(),times.end());
+
+	int sum1 = 0;
+	for (int i = 1; i < n; i++)
+	{
+		sum1 += times[i];
+	}
+	sum1 = sum1 + times.size()/2 * times[0];
+
+	int sum2 = 0;
+	int j = 0;
+	for (int i = n-1; i >= 0; i--)
+	{
+		if (i >= 2)
+		{
+			if (times[i] > times[1]*2 && i > 2)
+			{
+				sum2 = sum2 + times[i] + times[1] + times[1] + times[0];
+				i--;
+			}
+			else
+			{
+				sum2 = sum2 + times[0] + times[0] + times[i] + times[i-1];
+				i--;
+			/*	if (i != 0) 
+				{
+					sum2 += times[i];			
+					j++;
+				}
+				*/
+			}
+		}
+		else
+		{
+			sum2 += times[1];
+			break;
+		}
+	}
+//	if (times.size() > 2)
+//		sum2 = sum2 + (j+1)/2 * times[0];
+
+//	cout << sum1 << endl << sum2 << endl;
+	cout << sum2 << endl;
+}
+
+void algv1()
 {
 	int n;
 	cin >> n;
@@ -80,4 +141,9 @@ void main()
 
 	cout << sum << endl;
 	
+}
+
+void mainTest ()
+{
+	algv2();
 }

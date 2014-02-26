@@ -1,4 +1,4 @@
-Class: animal < test
+Class: animal < world
 Properties: growing, growing, regeneration
 Content: jak, millo, test, millo
 Class: bird < animal
@@ -7,5 +7,5 @@ Class: penguin < bird
 Properties: !fly
 Class: sparrow < bird
 Properties: small, one
-Class: test < abra
+Class: world < test
 Properties: test2

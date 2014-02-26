@@ -211,7 +211,7 @@ bool arrayVSarray(vector<int> mas1, vector<int> mas2)
 	return false;
 }*/
 
-void main()
+void main2()
 {
 	int n,m;
 	cin >> n >> m;
@@ -243,7 +243,7 @@ void main()
 
 	for (int i = 0; i < 2*n; i++)
 	{
-		if (in_array(i,)
+	//	if (in_array(i,)
 		if (fl[i] == false)
 		{
 			if (count1 > count2)
@@ -293,7 +293,7 @@ void main()
 		}
 	}
 */
-	if (round1.size() < n || round2.size() < n || impos = true)
+	if (round1.size() < n || round2.size() < n || impos == true)
 	{
 		cout << "IMPOSSIBLE" << endl;
 	}

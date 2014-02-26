@@ -181,6 +181,10 @@
 				RelativePath=".\code.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\code2.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
