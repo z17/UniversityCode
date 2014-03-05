@@ -211,7 +211,7 @@ bool arrayVSarray(vector<int> mas1, vector<int> mas2)
 	return false;
 }*/
 
-void main2()
+void main1()
 {
 	int n,m;
 	cin >> n >> m;

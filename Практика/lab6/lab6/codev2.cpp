@@ -33,7 +33,7 @@ struct pairsContainer
 	}
 };
 
-void main()
+void main2()
 {
 	vector<int> firstPart;
 	vector<int> secondPart;
