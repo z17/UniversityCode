@@ -3,33 +3,13 @@
 #include <complex>
 #include <cmath>
 #include <random>
-#include <iostream>
+#include <utility>
 #include <fstream>
 
 using namespace std;
-
-//typedef pair <float, float> Point;
 typedef complex <double> Point;
 
 struct Item{
-	/*
-	void operator+= (const Item& i){
-		//this->point.first += i.point.first;
-		//this->point.second += i.point.second;
-		this->point += i.point;
-	}
-
-	void operator/= (int i){
-		//this->point.first /= i;
-		//this->point.second /= i;
-	}
-
-	void operator-= (const Item& i){
-		//this->point.first -= i.point.first;
-		//this->point.second -= i.point.second;
-		this->point -= i.point;
-	}
-	*/
 	Item(){}
 	Item(double x, double y, bool cat){
 		point = Point(x, y);
@@ -39,52 +19,100 @@ struct Item{
 	bool category; // к какому классу принадлежит
 };
 
+// спец. структура для адекватной и удобной передачи параметров в конструктор set
+// включает в себя id класса, кол-во точек, и границы области (прямоугольники)
+// правда я с трудом представляю как задавать "кольца". 
+struct range
+{
+	int category;
+	int size;
+	pair<uniform_real_distribution <double>::param_type, uniform_real_distribution <double>::param_type> par;
+
+	range(){}
+
+	range(int _category, int _size, uniform_real_distribution <double>::param_type _par1, uniform_real_distribution <double>::param_type _par2)
+	{
+		category = _category;
+		size = _size;
+		par = make_pair(_par1, _par2);
+	}
+};
+
+
 class Set{
 public:
 	Set(){}
-	Set (vector<int> size, vector<vector<uniform_real_distribution <double>::param_type>> options) {
-		vector <Item> set1,
-			set2;
+
+	// так по-моему меньше путаницы с параметрами
+	Set(vector<range> params)
+	{
+		vector<vector<Item>> sets;
+		sets.resize(2);
 		random_device gen;
 		uniform_real_distribution <double> rndX;
-		uniform_real_distribution <double> rndY;	
-	
-		
-		rndX.param(options[0][0]);
-		rndY.param(options[0][1]);
-
-		// 1 тип
-		for(int i = 0; i < size[0]; ++i){			
-			Item p (rndX(gen), rndY(gen), 0);
-			set1.push_back (p);
+		uniform_real_distribution <double> rndY;
+		for (int i = 0; i < params.size(); i++)
+		{
+			rndX.param(params[i].par.first); 
+			rndY.param(params[i].par.second); 
+			for (int j = 0; j < params[i].size; j++)
+			{
+				// не очень разумно что category есть в Item, и в  тоже время для каждого класса есть отдельный массив sets
+				Item p(rndX(gen), rndY(gen), params[i].category);
+				sets[params[i].category].push_back(p);
+			}
 		}
-		rndX.param(options[0][2]);
-		rndY.param(options[0][3]);
-
-		for(int i = 0; i < size[1]; ++i){
-			Item p (rndX(gen), rndY(gen), 0);
-			set1.push_back (p);
-		}
-
-		// 2 тип
-		rndX.param(options[1][0]);
-		rndY.param(options[1][1]);
-
-		for(int i = 0; i < size[1]; ++i){
-			Item p (rndX(gen), rndY(gen), 1);
-			set2.push_back (p);
-		}
-		
-		rndX.param(options[1][2]);
-		rndY.param(options[1][3]);
-
-		for(int i = 0; i < size[0]; ++i){
-			Item p (rndX(gen), rndY(gen), 1);
-			set2.push_back (p);
-		}
-		divide (set1, set2);
+		divide (sets);
 	}
 
+	// для колец, первый - внешний прямоугольник, второй - внутренний, size берётся из первого
+	// третий - область другого класса
+	Set(range params1, range params2, range params3)
+	{
+		vector<vector<Item>> sets;
+		sets.resize(2);
+		random_device gen;
+		uniform_real_distribution <double> rndX;
+		uniform_real_distribution <double> rndY;
+		uniform_real_distribution <double>::param_type par1, par2;
+		pair<uniform_real_distribution <double>::param_type, uniform_real_distribution <double>::param_type> par;
+		par1._Init(0., 10.);
+		par2._Init(0., 10.);	
+		par = make_pair(par1, par2);
+		int k = 0;
+		rndX.param(par.first); 
+		rndY.param(par.second); 
+		while (k != params1.size)
+		{
+			double x, y;
+			x = rndX(gen);
+			y = rndY(gen);
+			if (x >= params1.par.first._Min && x <= params1.par.first._Max && y >= params1.par.second._Min && y <= params1.par.second._Max)
+			{
+				if (!(x >= params2.par.first._Min && x <= params2.par.first._Max && y >= params2.par.second._Min && y <= params2.par.second._Max))
+				{
+					k++;
+					Item p(x, y, params1.category);
+					sets[params1.category].push_back(p);
+				}
+			}
+		}
+
+
+		rndX.param(params3.par.first); 
+		rndY.param(params3.par.second); 
+		for (int j = 0; j < params3.size; j++)
+		{
+			Item p(rndX(gen), rndY(gen), params3.category);
+			sets[params3.category].push_back(p);
+		}
+
+
+		divide (sets);
+	}
+
+
+	// для вывода точек на графике
 	void printPoints()
 	{
 		ofstream fTest("test.txt");
@@ -109,21 +137,21 @@ public:
 		fSource.close();
 	}
 private:
-	void divide (vector <Item>& set1, vector <Item>& set2){
-		int size = set1.size();
+	void divide (vector<vector<Item>>& sets){
 
-		// совместить с версией Маши
-		for (int i =  0; i < size; i++)
+		// j % 2 == 0 - из-за этого условия половина идёт в тестовую, половина в основную 
+		for (int i = 0; i < sets.size(); i++)
 		{
-			if (i % 2 == 0)
+			for (int j = 0; j < sets[i].size(); j++)
 			{
-				source[0].push_back(set1[i]);
-				source[1].push_back(set2[i]);
-			}
-			else
-			{
-				test[0].push_back(set1[i]);
-				test[1].push_back(set2[i]);
+				if (j % 2 == 0)
+				{
+					source[i].push_back(sets[i][j]);
+				}
+				else
+				{
+					test[i].push_back(sets[i][j]);
+				}
 			}
 		}
 	}
@@ -252,38 +280,48 @@ private:
 };
 
 int main(){
+
 	const int N = 60;
-	vector<int> size(2);
-	size[0] = 300;
-	size[1] = 600;
-	vector<vector<uniform_real_distribution <double>::param_type>> options;
-	options.resize(2);
-	uniform_real_distribution <double>::param_type par;
-	par._Init(0., 7.);
-	options[0].push_back(par);
-	par._Init(0., 4.);
-	options[0].push_back(par);	
-	par._Init(0., 2.);
-	options[0].push_back(par);	
-	par._Init(4., 8.);		
-	options[0].push_back(par);
-				
-	par._Init(9., 10.);
-	options[1].push_back(par);
-	par._Init(0., 5.);
-	options[1].push_back(par);	
-	par._Init(4., 10.);
-	options[1].push_back(par);	
-	par._Init(5., 10.);
-	options[1].push_back(par);
+	uniform_real_distribution <double>::param_type par1, par2;
+
+/*	par1._Init(0., 4.);
+	par2._Init(0., 7.);	
+	range rectangle1(0, 400, par1, par2);
+	par1._Init(4., 8.);
+	par2._Init(0., 2.);	
+	range rectangle2(0, 200, par1, par2);
+	par1._Init(5., 10.);
+	par2._Init(4., 10.);	
+	range rectangle3(1, 400, par1, par2);
+	par1._Init(0., 5.);
+	par2._Init(9., 10.);
+	range rectangle4(1, 200, par1, par2);
+
+	vector<range> options;
+	options.push_back(rectangle1);
+	options.push_back(rectangle2);
+	options.push_back(rectangle3);
+	options.push_back(rectangle4);	
 	
+	
+	Set set(options);
+*/
+	
+	par1._Init(1., 9.);
+	par2._Init(1., 9.);	
+	range rectangle1(0, 800, par1, par2);
+	par1._Init(3., 6.);
+	par2._Init(3., 6.);	
+	range rectangle2(0, 800, par1, par2);	
+	par1._Init(4., 5.);
+	par2._Init(4., 5.);	
+	range rectangle3(1, 300, par1, par2);
 
-
-	Set set(size, options);
+	Set set(rectangle1, rectangle2, rectangle3);
 	set.printPoints();
 	StandardMethod method1(set);
 	NeighborMethod method2(set);
 
-	system("pause");
+
 	return 0;
 }
