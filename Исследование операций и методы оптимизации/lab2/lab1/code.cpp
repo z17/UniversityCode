@@ -268,14 +268,126 @@ int main()
 	*/
 	
 	srand(time(NULL));
-	int n = 100;
+	int n = 1;
 	int k = 0;
 
 	for (int i = 0; i < n; i++)
 	{
 		int cand = rand() % 4 + 3;
 		int votes = rand() % 1000 + 500;
+		cand = 5;
+		votes = 45;
 		input Data(cand, votes);
+		Data.vote[0] = 10;
+		Data.vote[1] = 8;
+		Data.vote[2] = 12;
+		Data.vote[3] = 7;
+		Data.vote[4] = 8;
+
+		Data.voteSh.clear();
+		vector<int> test;
+		test.resize(5);
+		/* тест из вики
+		A B C D E
+		1 2 3 4 5
+
+		5 ACBED		1 3 2 5 4
+		5 ADECB		1 4 5 3 2
+		8 BEDAC		2 5 4 1 3
+		3 CABED		3 1 2 5 4
+		7 CAEBD		3 1 5 2 4
+		2 CBADE		3 2 1 4 5
+		7 DCEBA		4 3 5 2 1
+		8 EBADC		5 2 1 4 3
+		*/
+		test[0] = 1;
+		test[1] = 3;
+		test[2] = 2;
+		test[3] = 5;
+		test[4] = 4;
+		Data.voteSh.push_back(test);		// 5
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		test[0] = 1;
+		test[1] = 4;
+		test[2] = 5;
+		test[3] = 3;
+		test[4] = 2;
+		Data.voteSh.push_back(test);		// 5
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		test[0] = 2;
+		test[1] = 5;
+		test[2] = 4;
+		test[3] = 1;
+		test[4] = 3;
+		Data.voteSh.push_back(test);		// 8
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		test[0] = 3;
+		test[1] = 1;
+		test[2] = 2;
+		test[3] = 5;
+		test[4] = 4;
+		Data.voteSh.push_back(test);		// 3
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		
+		test[0] = 3;
+		test[1] = 1;
+		test[2] = 5;
+		test[3] = 2;
+		test[4] = 4;
+		Data.voteSh.push_back(test);		// 7
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);		
+
+		test[0] = 3;
+		test[1] = 2;
+		test[2] = 1;
+		test[3] = 4;
+		test[4] = 5;
+		Data.voteSh.push_back(test);		// 2
+		Data.voteSh.push_back(test);
+		
+		test[0] = 4;
+		test[1] = 3;
+		test[2] = 5;
+		test[3] = 2;
+		test[4] = 1;
+		Data.voteSh.push_back(test);		// 7
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		test[0] = 5;
+		test[1] = 2;
+		test[2] = 1;
+		test[3] = 4;
+		test[4] = 3;
+		Data.voteSh.push_back(test);		// 8
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
+		Data.voteSh.push_back(test);
 		FPP one(Data);
 		Schulze two(Data);
 		if (one.rating[0] == two.rating[0])
@@ -283,7 +395,7 @@ int main()
 			k++;
 		}
 	}
-	cout << "Процент совпадений победителей: " << (double)((double)k/(double)n) * 100 << "%" << endl;
+	cout << "Процент совпадений победителей: " << k << "%" << endl;
 
 	system("pause");
 	return 0;
