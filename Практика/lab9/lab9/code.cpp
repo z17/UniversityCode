@@ -1,4 +1,5 @@
 #include <iostream>
+#include <assert.h>
 
 using namespace std;
 
@@ -19,6 +20,11 @@ class shared_ptr
 	int *count;
 
 	public:
+
+	int getCoint()
+	{
+		return *count;
+	}
 	shared_ptr()
 	{ 
 		count = new int;
@@ -30,9 +36,9 @@ class shared_ptr
 		*count = 1;
 		obj = _obj;
 	}
-	~shared_ptr() 
+	virtual ~shared_ptr() 
 	{	
-		*count--;
+		(*count)--;
 		if(*count == 0) 
 		{
 			delete count;
@@ -54,19 +60,29 @@ class shared_ptr
 	 {
 		obj = _obj.obj;
 		count = _obj.count;
-		*count++;
+		(*count)++;
 		return *this;
 	 }
 };
 
+void test(shared_ptr<myClass> &q)
+{
+	shared_ptr<myClass> q2;
+	q2 = q;	
+	assert(q2->val == q->val);	
+	assert(q2.getCoint() == 3);	
+}
 
 int main()
 {
 	shared_ptr<myClass> p1(new myClass);
 	shared_ptr<myClass> p2;
 	p1 -> val = 5;
-	p2 = p1;
-	
+	p2 = p1;	
+	assert(p2->val == p1->val);		
+	assert(p2.getCoint() == 2);	
+	test(p1);	
+	assert(p2.getCoint() == 2);	
 
 	return 0;
 }

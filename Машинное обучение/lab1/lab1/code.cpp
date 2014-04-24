@@ -21,7 +21,6 @@ struct Item{
 
 // спец. структура для адекватной и удобной передачи параметров в конструктор set
 // включает в себя id класса, кол-во точек, и границы области (прямоугольники)
-// правда я с трудом представляю как задавать "кольца". 
 struct range
 {
 	int category;
@@ -55,11 +54,20 @@ public:
 		{
 			rndX.param(params[i].par.first); 
 			rndY.param(params[i].par.second); 
+			int coutError = 0;
 			for (int j = 0; j < params[i].size; j++)
 			{
-				// не очень разумно что category есть в Item, и в  тоже время для каждого класса есть отдельный массив sets
-				Item p(rndX(gen), rndY(gen), params[i].category);
-				sets[params[i].category].push_back(p);
+				int k = params[i].category;
+			/*	if (coutError < params[i].size / 10)	внесение 10% ошибок
+				{
+					coutError++;
+					if (k == 0)
+						k = 1;
+					else
+						k = 0;
+				}*/
+				Item p(rndX(gen), rndY(gen), k);
+				sets[k].push_back(p);
 			}
 		}
 		divide (sets);
@@ -82,6 +90,9 @@ public:
 		int k = 0;
 		rndX.param(par.first); 
 		rndY.param(par.second); 
+
+		int coutError = 0;
+
 		while (k != params1.size)
 		{
 			double x, y;
@@ -91,9 +102,21 @@ public:
 			{
 				if (!(x >= params2.par.first._Min && x <= params2.par.first._Max && y >= params2.par.second._Min && y <= params2.par.second._Max))
 				{
+
+					int cat = params1.category;
+					if (coutError < params1.size / 10) //	внесение 10% ошибок
+					{
+						coutError++;
+						if (cat == 0)
+							cat = 1;
+						else
+							cat = 0;
+					}
+
+
 					k++;
-					Item p(x, y, params1.category);
-					sets[params1.category].push_back(p);
+					Item p(x, y, cat);
+					sets[cat].push_back(p);
 				}
 			}
 		}
@@ -101,10 +124,22 @@ public:
 
 		rndX.param(params3.par.first); 
 		rndY.param(params3.par.second); 
+		coutError = 0;
+
 		for (int j = 0; j < params3.size; j++)
 		{
-			Item p(rndX(gen), rndY(gen), params3.category);
-			sets[params3.category].push_back(p);
+			int cat = params3.category;
+			if (coutError < params3.size / 10)	// внесение 10% ошибок
+			{
+				coutError++;
+				if (cat == 0)
+					cat = 1;
+				else
+					cat = 0;
+			}
+			
+			Item p(rndX(gen), rndY(gen), cat);
+			sets[cat].push_back(p);
 		}
 
 
@@ -115,26 +150,36 @@ public:
 	// для вывода точек на графике
 	void printPoints()
 	{
-		ofstream fTest("test.txt");
-		ofstream fSource("source.txt");
+		ofstream fTest1("test1.txt");
+		ofstream fTest2("test2.txt");
+		ofstream fSource1("source1.txt");
+		ofstream fSource2("source2.txt");
 
 		for (int j = 0; j < 2; j++)
 		{
 			for (int i = 0; i < test[j].size(); i++)
 			{
-				fTest << test[j][i].point.real() << "\t" << test[j][i].point.imag() << endl;
+				if (j==0)
+					fTest1 << test[j][i].point.real() << "\t" << test[j][i].point.imag() << endl;
+				else
+					fTest2 << test[j][i].point.real() << "\t" << test[j][i].point.imag() << endl;
 			}
 		}
 		for (int j = 0; j < 2; j++)
 		{
 			for (int i = 0; i < source[j].size(); i++)
 			{
-				fSource << source[j][i].point.real() << "\t" << source[j][i].point.imag() << endl;
+				if (j==0)
+					fSource1 << source[j][i].point.real() << "\t" << source[j][i].point.imag() << endl;
+				else
+					fSource2 << source[j][i].point.real() << "\t" << source[j][i].point.imag() << endl;
 			}
 		}
 
-		fTest.close();
-		fSource.close();
+		fTest1.close();
+		fSource1.close();
+		fTest2.close();
+		fSource2.close();
 	}
 private:
 	void divide (vector<vector<Item>>& sets){
@@ -172,22 +217,46 @@ public:
 
 private:
 	void findDiff(){
-		vector<int> count(2,0);
+	//	vector<int> count(2,0);
+		int count = 0;
+
+		ofstream f1("StandardMethod_class1.txt");
+		ofstream f2("StandardMethod_class2.txt");
+
+		int sizeAll = 0;
 
 		for(int k = 0; k < 2; ++k){
 			int size = set.test[k].size();
+			sizeAll += size;
 			bool cmp = false;
 			
 			for(int i = 0; i < size; ++i){
 				cmp = k == solve(set.test[k][i]);
+				if (solve(set.test[k][i]) == false)
+				{
+					f1 << set.test[k][i].point.real() << "\t" << set.test[k][i].point.imag() << endl;
+				}
+				if (solve(set.test[k][i]) == true)
+				{
+					f2 << set.test[k][i].point.real() << "\t" << set.test[k][i].point.imag() << endl;
+				}
+
 				if (cmp)
 				{
-					count[k]++;
+				//	count[k]++;
+					count++;
 				}
 				diff.push_back(cmp);
 			}
-			percent = (double)((double)count[k] / (double)size);
+			
+		//	percent = (double)((double)count[k] / (double)size);
 		}
+		
+		percent = (double)((double)count / (double)sizeAll);
+		
+		
+		f1.close();
+		f2.close();
 	}
 	void setStandards(){
 		int size = set.source[0].size();
@@ -240,15 +309,43 @@ public:
 
 private:
 	void findDiff(){
+		
+		ofstream f1("NeighborMethod_class1.txt");
+		ofstream f2("NeighborMethod_class2.txt");
+
+		int sizeAll = 0;
+		int count = 0;
+
 		for(int k = 0; k < 2; ++k){
 			int size = set.test[k].size();
+			sizeAll += size;
 			bool cmp = false;
 
 			for(int i = 0; i < size; ++i){
 				cmp = k == solve(set.test[k][i]);
+
+				if (solve(set.test[k][i]) == false)
+				{
+					f1 << set.test[k][i].point.real() << "\t" << set.test[k][i].point.imag() << endl;
+				}
+				if (solve(set.test[k][i]) == true)
+				{
+					f2 << set.test[k][i].point.real() << "\t" << set.test[k][i].point.imag() << endl;
+				}
+
 				diff.push_back(cmp);
+
+				if (cmp)
+				{
+					count++;
+				}
 			}
 		}
+		
+		percent = (double)((double)count / (double)sizeAll);
+
+		f1.close();
+		f2.close();
 	}
 	bool solve(const Item& x){
 		Item neighbor[2];
@@ -275,6 +372,7 @@ private:
 		return cat;
 	}
 
+	double percent;
 	Set set;
 	vector <bool> diff;
 };
@@ -283,19 +381,21 @@ int main(){
 
 	const int N = 60;
 	uniform_real_distribution <double>::param_type par1, par2;
-
-/*	par1._Init(0., 4.);
+	
+	
+	par1._Init(0., 4.);
 	par2._Init(0., 7.);	
-	range rectangle1(0, 400, par1, par2);
+	range rectangle1(0, 100, par1, par2);
 	par1._Init(4., 8.);
 	par2._Init(0., 2.);	
-	range rectangle2(0, 200, par1, par2);
+	range rectangle2(0, 50, par1, par2);
+
 	par1._Init(5., 10.);
 	par2._Init(4., 10.);	
-	range rectangle3(1, 400, par1, par2);
+	range rectangle3(1, 100, par1, par2);
 	par1._Init(0., 5.);
 	par2._Init(9., 10.);
-	range rectangle4(1, 200, par1, par2);
+	range rectangle4(1, 50, par1, par2);
 
 	vector<range> options;
 	options.push_back(rectangle1);
@@ -303,25 +403,25 @@ int main(){
 	options.push_back(rectangle3);
 	options.push_back(rectangle4);	
 	
-	
 	Set set(options);
-*/
 	
+	/*
 	par1._Init(1., 9.);
 	par2._Init(1., 9.);	
-	range rectangle1(0, 800, par1, par2);
-	par1._Init(3., 6.);
-	par2._Init(3., 6.);	
-	range rectangle2(0, 800, par1, par2);	
-	par1._Init(4., 5.);
-	par2._Init(4., 5.);	
-	range rectangle3(1, 300, par1, par2);
+	range rectangle1(0, 200, par1, par2);
+	par1._Init(2., 7.);
+	par2._Init(2., 7.);	
+	range rectangle2(0, 200, par1, par2);	
+	par1._Init(3.5, 5.5);
+	par2._Init(3.5, 5.5);	
+	range rectangle3(1, 200, par1, par2);
 
-	Set set(rectangle1, rectangle2, rectangle3);
+	Set set(rectangle1, rectangle2, rectangle3);*/
+
+
 	set.printPoints();
 	StandardMethod method1(set);
 	NeighborMethod method2(set);
-
 
 	return 0;
 }
