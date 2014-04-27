@@ -287,6 +287,7 @@ int main()
 		Data.voteSh.clear();
 		vector<int> test;
 		test.resize(5);
+
 		/* тест из вики
 		A B C D E
 		1 2 3 4 5
@@ -390,12 +391,14 @@ int main()
 		Data.voteSh.push_back(test);
 		FPP one(Data);
 		Schulze two(Data);
+		one.print();
+		two.print();
 		if (one.rating[0] == two.rating[0])
 		{
 			k++;
 		}
 	}
-	cout << "Процент совпадений победителей: " << k << "%" << endl;
+	cout << "Процент совпадений победителей: " << (double)((double)k/(double)n) << "%" << endl;
 
 	system("pause");
 	return 0;
