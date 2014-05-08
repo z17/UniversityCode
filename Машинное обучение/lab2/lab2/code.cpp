@@ -13,11 +13,14 @@ using namespace std;
 // потом пришлось добавить области, так что может показаться кривым способом
 // области добавляются с помощью таких вот функций, возвращающих true если точка, переданная туда как аргумент, входит в область
 // area1, area2 и area3 это три окружности
+
+/*
+1 часть
 bool area1(const double _x, const double _y)
 {
-	double x = 1;
-	double y = 1;
-	double r = 2;
+	double x = 2;
+	double y = 2;
+	double r = 2.5;
 
 	double dist = sqrt(pow((_x - x),2) + pow((_y - y),2));
 	if (dist <= r)
@@ -27,9 +30,9 @@ bool area1(const double _x, const double _y)
 
 bool area2(const double _x, const double _y)
 {
-	double x = 9;
-	double y = 9;
-	double r = 2;
+	double x = 7;
+	double y = 5;
+	double r = 3.5;
 
 	double dist = sqrt(pow((_x - x),2) + pow((_y - y),2));
 	if (dist <= r)
@@ -39,8 +42,46 @@ bool area2(const double _x, const double _y)
 
 bool area3(const double _x, const double _y)
 {
-	double x = 1;
-	double y = 9;
+	double x = 2;
+	double y = 8;
+	double r = 2.5;
+
+	double dist = sqrt(pow((_x - x),2) + pow((_y - y),2));
+	if (dist <= r)
+		return true;
+	return false;
+}*/
+
+// 2 часть
+/*
+bool area1(const double _x, const double _y)
+{
+	double x = 2;
+	double y = 1;
+	double r = 2.8;
+
+	double dist = sqrt(pow((_x - x),2) + pow((_y - y),2));
+	if (dist <= r)
+		return true;
+	return false;
+}
+
+bool area2(const double _x, const double _y)
+{
+	double x = 8;
+	double y = 1;
+	double r = 2.8;
+
+	double dist = sqrt(pow((_x - x),2) + pow((_y - y),2));
+	if (dist <= r)
+		return true;
+	return false;
+}
+
+bool area3(const double _x, const double _y)
+{
+	double x = 5;
+	double y = 5;
 	double r = 2;
 
 	double dist = sqrt(pow((_x - x),2) + pow((_y - y),2));
@@ -50,7 +91,87 @@ bool area3(const double _x, const double _y)
 }
 
 
+bool area4(const double _x, const double _y)
+{
+	double x = 2;
+	double y = 9;
+	double r = 2.8;
 
+	double dist = sqrt(pow((_x - x),2) + pow((_y - y),2));
+	if (dist <= r)
+		return true;
+	return false;
+}
+
+bool area5(const double _x, const double _y)
+{
+	double x = 8;
+	double y = 9;
+	double r = 2.8;
+
+	double dist = sqrt(pow((_x - x),2) + pow((_y - y),2));
+	if (dist <= r)
+		return true;
+	return false;
+}
+*/
+
+// 3 часть
+bool area1(const double _x, const double _y)
+{
+	double x1,y1,x2,y2,x3,y3,x4,y4;
+	x1 = 0;
+	x2 = 5;
+	y1 = 0;
+	y2 = 2;
+	x3 = 0;
+	x4 = 2;
+	y3 = 2;
+	y4 = 7;
+	if (_x < x2 && _x > x1 && _y < y2 && _y > y1 || _x < x4 && _x > x3 && _y < y4 && _y > y3)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool area2(const double _x, const double _y)
+{
+	double x1,y1,x2,y2,x3,y3,x4,y4;
+	x1 = 7;
+	x2 = 10;
+	y1 = 1;
+	y2 = 4;
+	x3 = 4;
+	x4 = 10;
+	y3 = 4;
+	y4 = 6;
+
+	if (_x < x2 && _x > x1 && _y < y2 && _y > y1 || _x < x4 && _x > x3 && _y < y4 && _y > y3)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool area3(const double _x, const double _y)
+{
+	double x1,y1,x2,y2,x3,y3,x4,y4;
+	x1 = 1;
+	x2 = 3;
+	y1 = 8;
+	y2 = 10;
+	x3 = 3;
+	x4 = 9;
+	y3 = 7;
+	y4 = 10;
+
+	if (_x < x2 && _x > x1 && _y < y2 && _y > y1 || _x < x4 && _x > x3 && _y < y4 && _y > y3)
+	{
+		return true;
+	}
+	return false;
+}
 
 
 // одна точка
@@ -72,6 +193,7 @@ struct item
 {
 	dot point;
 	int nClass;
+	int nClass_data;
 
 	item() {}
 
@@ -81,7 +203,7 @@ struct item
 		double y = rand() % ((max - min)*100) + min*100;
 		point.x = x / 100;
 		point.y = y / 100;
-		nClass = 0;
+		nClass = 0;			// тут храним номер класса, который посчитали
 	}
 
 
@@ -109,6 +231,7 @@ struct itemList
 {
 	vector<item> list;			// список
 	vector<dot> center;			// список центров
+	double percent;
 
 	itemList() {}
 	itemList (int d, int n, int min, int max)		// кол-во классов, кол-во образов, границы координат
@@ -117,10 +240,10 @@ struct itemList
 		srand(time(NULL));
 		for(int i = 0; i < n; i++)
 		{
-			// item x(min, max, area1);		для полного рандома
+			// item x(min, max);		для полного рандома
 			// list.push_back(x);
 
-			int q = rand() % 3 + 1;			// случайно выбирается в какую область попадёт следующая точка, и потом вызывается соответствующий конструктор 
+			int q = rand() % d + 1;			// случайно выбирается в какую область попадёт следующая точка, и потом вызывается соответствующий конструктор 
 			if (q == 1)
 			{
 				item x(min, max, area1);
@@ -135,6 +258,16 @@ struct itemList
 			{
 				item x(min, max, area3);
 				list.push_back(x);
+			}
+			if (q == 4)
+			{
+//				item x(min, max, area4);
+//				list.push_back(x);
+			}
+			if (q == 5)
+			{
+//				item x(min, max, area5);
+//				list.push_back(x);
 			}
 		}
 	}
@@ -273,19 +406,55 @@ struct itemList
 		}
 	}
 
+	int getNumberClass(dot point)
+	{
+		if (area1(point.x, point.y))
+			return 1;
+			
+		if (area2(point.x, point.y))
+			return 2;
+
+		if (area3(point.x, point.y))
+			return 3;
+		
+//		if (area4(point.x, point.y))
+//			return 4;
+
+//		if (area5(point.x, point.y))
+	//		return 5;
+
+		return 0;
+	}
+
+
+	void getPercent()
+	{
+		int k = 0;
+		for (int i = 0; i < list.size(); i++)
+		{
+			if (getNumberClass(center[list[i].nClass - 1]) == getNumberClass(list[i].point))
+			{
+				k++;
+			}
+		}
+		percent = (double)k / (double)list.size();
+		cout << percent << endl;
+	}
+
 };
 
 
 int main()
 {
 	int d = 3;			// кол-во классов
-	int n = 500;		// кол-во образов
+	int n = 1000;		// кол-во образов
 	int min = 0;		// границы
 	int max = 10;
 	itemList one(d,n,min,max);
 	one.firstCenters();
 	
 	one.kmeans();
+	one.getPercent();
 	one.printList("test2");		// итоговый вывод
 
 	system("pause");
