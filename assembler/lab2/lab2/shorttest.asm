@@ -2,8 +2,6 @@ section .text
 global _fdcttest_s
 global _idcttest_s
 
-
-_fdcttest_s:
 ; EAX,				ECX,					EDX,				EBX,				ESP,				EBP,				ESI,				EDI,					R8D		
 ; AX (Accumulator)	CX (Count Register),	DX (Data Register),	BX (Base Register),	SP (Stack Pointer),	BP (Base Pointer),	SI (Source Index),	DI (Destination Index),	R8W — R15W — 16-битные
 ; AH, AL,			CH,	CL,					DH,	DL,				BH, BL,				SPL,				BPL,				SIL,				DIL,					R8B — R15B 
@@ -14,112 +12,136 @@ _fdcttest_s:
 ; ebx - a в matrix_mul
 ; esp - входные параметры
 ; ebp - 3й параметр
-; esi - si - для проверки нужно ли умножить на 0,125/8
+; esi - si - для третьего параметра
 ; edi - di - для проверки выполняем мы сейчас fdc или idc 
+; di, значения:
+; 1 - мы в fcd, умножение на 8 ещё не нужно
+; 2 - мы в fcd, умножение на 8 в этот проход цикла сделать
+; 4 - мы в idc ...
+; 5 - мы в idc ...
+
+_fdcttest_s:
+
 	mov eax, [esp + 4]			; 1-й параметр	
 	mov edx, [esp + 8]			; 2-й параметр
+	mov esi, [esp + 12]			; 3-й параметр
 	mov ebx, m_1
 	
+f_cicle_start:	
 	xor di, di
 	inc di
+		
+	jmp matrix_mul
+	
+go_fcd:
+
+	sub edx, 224
+
+	cmp di, 2h
+	je f_end_mul
+	inc di
+	mov eax, m_2		; b = m2
+	mov ebx, edx		; a = edx
+	jmp matrix_mul
+
+f_end_mul:
+
+	dec esi
+	cmp esi, 0
+	je f_cicle_end
+		
+	mov eax, [esp + 4]	; обновляем переменные и сдвигаем на следующий блок
+	mov edx, [esp + 8]
+	
+	mov ebx, [esp + 12]		; цикл для рассчёта сдвига текущей матрицы
+
+	cycle_shift_start:		
+		add eax, 256
+		add edx, 256
+		dec ebx
+		cmp esi, ebx
+		je cycle_shift_end
+		jmp cycle_shift_start
+
+	cycle_shift_end:
+	mov ebx, m_1			; обновляем значение ebx
+
+	jmp f_cicle_start
+
+f_cicle_end:
+ret
+
+; -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+_idcttest_s:
+
+	mov eax, [esp + 4]			; 1-й параметр	
+	mov edx, [esp + 8]			; 2-й параметр	
+	mov esi, [esp + 12]			; 3-й параметр
+	mov ebx, m_2
+	
+i_cicle_start:
+	xor di, di
+	mov di, 4
+
+	jmp matrix_mul
+
+go_idc:
+
+	sub edx, 224
+
+	cmp di, 5h
+	je i_end_mul
+	inc di
+	mov eax, m_1		; b = m1
+	mov ebx, edx		; a = edx
+	jmp matrix_mul
+
+i_end_mul:
+
+	dec esi
+	cmp esi, 0
+	je i_cicle_end
+		
+	mov eax, [esp + 4]	; обновляем переменные и сдвигаем на следующий блок
+	mov edx, [esp + 8]
+	
+	mov ebx, [esp + 12]		; цикл для рассчёта сдвига текущей матрицы
+	i_cycle_shift_start:		
+		add eax, 256
+		add edx, 256
+		dec ebx
+		cmp esi, ebx
+		je i_cycle_shift_end
+		jmp i_cycle_shift_start
+
+	i_cycle_shift_end:
+	mov ebx, m_2
+	
+	jmp i_cicle_start
+
+i_cicle_end:
+ret
+
+	
+
+	i_mul8_start:			; умножение на 8
+		mulps xmm3, [mul8]
+		mulps xmm4, [mul8]
+		jmp mul8_end
+	
+	
+	f_mul8_start:			; деление на 8
+		mulps xmm3, [del8]
+		mulps xmm4, [del8]
+		jmp mul8_end	
+	
 
 
 	; умножение матриц, C = A*B
 	; a = ebx
 	; b = eax
 	; c = edx
-	xor si, si
-	jmp matrix_mul
-
-;	----
-
-	go_fcd:
-
-	sub edx, 224
-
-
-	cmp si, 1h
-	je f_end_mul
-	inc si
-	mov eax, m_2		; b = m2
-	mov ebx, edx		; a = edx
-	jmp matrix_mul
-
-	f_end_mul:
-
-	ret
-
-; -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-_idcttest_s:
-;	pushad
-	;xor ebp, ebp	
-
-	mov eax, [esp + 4]			; 1-й параметр	
-	mov edx, [esp + 8]			; 2-й параметр
-;	mov ebp, [esp + 12]			; 3-й параметр
-	mov ebx, m_2
-
-cicle_start:
-	
-	xor di, di
-	inc di
-	inc di
-
-	xor si, si
-	jmp matrix_mul
-
-	go_idc:
-
-	sub edx, 224
-
-	cmp si, 1h
-	je i_end_mul
-	inc si
-	mov eax, m_1		; b = m1
-	mov ebx, edx		; a = edx
-	jmp matrix_mul
-	i_end_mul:
-
-;	dec ebp
-;	cmp ebp, 0h
-;	je cicle_end
-
-
-;	jmp cicle_start
-
-cicle_end:
-
-;	popad
-	ret
-
-
-
-
-mul8_start:
-
-	cmp di, 1				; если 1, то идём в блок деления на 8
-	je f_mul8_start	
-	cmp di, 2				; если 2, то идём в блок умножения на 8
-	je i_mul8_start
-
-	i_mul8_start:			; деление на 8
-		mulps xmm3, [mul8]
-		mulps xmm4, [mul8]
-		cmp si, 1h
-		je mul8_end
-	jmp mul8_end
-	
-	
-	f_mul8_start:			; деление на 8
-		mulps xmm3, [del8]
-		mulps xmm4, [del8]
-		cmp si, 1h
-		je mul8_end
-	jmp mul8_end	
-
-
-
 matrix_mul:		
 	xor cl, cl			; обнуляем счётчик\ cl - счётчик строк	
 	start:		
@@ -128,11 +150,11 @@ matrix_mul:
 		xor ch, ch
 		mul_start:		
 		;---------------
-		movups xmm0, [ebx]		; получили 1й эллемент 	
+		movaps xmm0, [ebx]		; получили 1й эллемент 	
 		pshufd xmm0, xmm0, 0x00
 
-		movups xmm1, [eax]		; получаем первую строку из b
-		movups xmm2, [eax+16]
+		movaps xmm1, [eax]		; получаем первую строку из b
+		movaps xmm2, [eax+16]
 
 		mulps xmm1, xmm0	; умножаем 
 		mulps xmm2, xmm0	; получаем ряды типа (a1*b1, a1*b2, a1*b3, a1*b4)
@@ -140,12 +162,12 @@ matrix_mul:
 		addps xmm3, xmm1		; тут храним результат, в конечном итоге в xmm3 и xmm4 будет строка c1 c2 c3 c4 c5 c6 c7 c8
 		addps xmm4, xmm2
 		;----------------
-		movups xmm0, [ebx]		; получили 2й эллемент 	
+		movaps xmm0, [ebx]		; получили 2й эллемент 	
 		pshufd xmm0, xmm0, 0x55
 
 		add eax, 32
-		movups xmm1, [eax]		; получаем вторую строку из b
-		movups xmm2, [eax+16]
+		movaps xmm1, [eax]		; получаем вторую строку из b
+		movaps xmm2, [eax+16]
 
 		mulps xmm1, xmm0	; умножаем 
 		mulps xmm2, xmm0	; получаем ряды типа (a1*b1, a1*b2, a1*b3, a1*b4)
@@ -154,12 +176,12 @@ matrix_mul:
 		addps xmm4, xmm2
 
 		;----------------
-		movups xmm0, [ebx]		; получили 3й эллемент 	
+		movaps xmm0, [ebx]		; получили 3й эллемент 	
 		pshufd xmm0, xmm0, 0xAA
 
 		add eax, 32
-		movups xmm1, [eax]		; получаем вторую строку из b
-		movups xmm2, [eax+16]
+		movaps xmm1, [eax]		; получаем вторую строку из b
+		movaps xmm2, [eax+16]
 
 		mulps xmm1, xmm0	; умножаем 
 		mulps xmm2, xmm0	; получаем ряды типа (a1*b1, a1*b2, a1*b3, a1*b4)
@@ -167,12 +189,12 @@ matrix_mul:
 		addps xmm3, xmm1	; суммиируем результат с предыдущим
 		addps xmm4, xmm2
 		;----------------
-		movups xmm0, [ebx]		; получили 4й эллемент 	
+		movaps xmm0, [ebx]		; получили 4й эллемент 	
 		pshufd xmm0, xmm0, 0xFF
 
 		add eax, 32
-		movups xmm1, [eax]		; получаем вторую строку из b
-		movups xmm2, [eax+16]
+		movaps xmm1, [eax]		; получаем вторую строку из b
+		movaps xmm2, [eax+16]
 
 		mulps xmm1, xmm0	; умножаем 
 		mulps xmm2, xmm0	; получаем ряды типа (a1*b1, a1*b2, a1*b3, a1*b4)
@@ -191,14 +213,17 @@ matrix_mul:
 		; в этот момент у нас записаны в xmm3 и xmm4 строка c1 c2 c3 c4 c5 c6 c7 c8				
 		sub eax, 224	; возвращаемся в начало матрицы b
 		sub ebx, 16		; возвращаем ebx в начало строки
-
-		cmp si, 1h
-		je mul8_start		;делим на 8 регистры xmm3, xmm4, но только если si=1, т.е. мы уже умножили матрицы между собой 
+	
+		
+		cmp di, 2h			;делим\умножаем на 8 регистры xmm3, xmm4, но только если di=1, т.е. мы уже умножили матрицы между собой 
+		je f_mul8_start
+		cmp di, 5h
+		je i_mul8_start
 
 		mul8_end:
 
-		movups [edx], xmm3			; записываем первые 4
-		movups [edx+16], xmm4		; записываем вторые 4			
+		movaps [edx], xmm3			; записываем первые 4
+		movaps [edx+16], xmm4		; записываем вторые 4			
 
 		cmp cl, 7h		;	переходим на ret если прошли по всей матрице
 		je return
@@ -210,9 +235,14 @@ matrix_mul:
 	return: 
 
 	
-	cmp di, 1				; если 1, то идём в блок fcd
+	cmp di, 1				; если 1 или 2, то идём в блок fcd
 	je go_fcd
-	cmp di, 2				; если 2, то идём в блок idc
+	cmp di, 2				
+	je go_fcd
+
+	cmp di, 5				; если 4 или 5, то идём в блок idc
+	je go_idc	
+	cmp di, 4				
 	je go_idc
 	
 
