@@ -6,13 +6,13 @@ using namespace std;
 
 class IShapeObserver 
 {   
-private:
+public:
 	virtual void OnChange( int pos, double x, double y ) = 0;  
 };
 
 class myObserver : IShapeObserver
 {
-
+public:
 	void OnChange(int pos, double x, double y)
 	{
 		cout << "change: id = " << pos << " x = " << x << " y = " << y << endl;
@@ -46,6 +46,10 @@ public:
 	}
 	~PointWrapper()
 	{
+		for (int i = 0; i < points.size(); i++)
+		{
+			delete(points[i]);
+		}
 	}
 
 	void addPoint(double x, double y)
@@ -78,7 +82,15 @@ public:
 	}
 	void UnregisterObserver (myObserver* ptr_observer )
 	{
-	//	 Observers.erase ( ptr_observer ); 
+		int i = 0;
+		while ( i < Observers.size() && Observers[i] != ptr_observer)
+		{
+			i++;
+		}
+		if ( i != Observers.size())
+		{
+			Observers.erase ( Observers.begin() + i );	
+		}
 	}
 
 };
@@ -102,7 +114,7 @@ int main()
 	}
 	//pull.printPoints();
 	pull.pointChange(2,9,9);
-
+	pull.UnregisterObserver(ptr_obs1);
 	f.close();
 	system("pause");
 	return 0;
