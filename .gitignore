@@ -1,5 +1,12 @@
 *.vcxproj
 *.vcxproj.filters
+*.vcxproj.user
+*.ipch
+*.exe
+*.ilk
+*.pdb
+*.tlog
+
 
 #################
 ## Eclipse
